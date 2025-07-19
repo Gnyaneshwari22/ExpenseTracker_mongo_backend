@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const User = require("../models/User");
 const ForgotPassword = require("../models/ForgotPassword");
 const sendResetEmail = require("../utils/sendResetEmail"); // Gmail-based email sender
+require("dotenv").config();
 
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
@@ -25,7 +26,7 @@ exports.forgotPassword = async (req, res) => {
       return res.status(500).json({ message: "Failed to create reset token" });
     }
 
-    const resetUrl = `http://localhost:3001/reset-password/${requestId}`;
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${requestId}`;
 
     try {
       await sendResetEmail(email, resetUrl);

@@ -10,46 +10,6 @@ const {
 } = require("../controllers/paymentController");
 const authenticate = require("../middleware/authMiddleware");
 
-// router.post("/pay", authenticate, async (req, res) => {
-//   try {
-//     const { amount, customerId, customerPhone, customerEmail } = req.body;
-
-//     // Validate inputs
-//     if (!amount || !customerId || !customerPhone) {
-//       return res.status(400).json({ error: "Missing required fields" });
-//     }
-
-//     // Create order
-//     const { payment_session_id, order_id } = await createOrder({
-//       orderAmount: amount,
-//       customerID: customerId,
-//       customerPhone,
-//       customerEmail,
-//     });
-
-//     // Save to database
-//     const order = new Order({
-//       orderId: order_id,
-//       userId: req.user._id, // From auth middleware
-//       amount,
-//       status: "PENDING",
-//     });
-//     await order.save();
-
-//     res.json({
-//       success: true,
-//       paymentSessionId: payment_session_id,
-//       orderId: order_id,
-//     });
-//   } catch (error) {
-//     console.error("Payment Error:", error);
-//     res.status(500).json({
-//       success: false,
-//       error: error.message || "Payment processing failed",
-//     });
-//   }
-// });
-
 // Check payment status
 
 router.post("/pay", authenticate, async (req, res) => {
@@ -147,33 +107,38 @@ router.get("/status/:orderId", async (req, res) => {
   }
 });
 
-// Cashfree Webhook
 router.post("/cashfree-webhook", async (req, res) => {
+  //console.log("✅ Webhook HIT ===> at", new Date().toLocaleString());
+  console.log("📦 Webhook Payload:", JSON.stringify(req.body, null, 2));
+
   try {
+    const data = req.body?.data;
+    if (!data || !data.order || !data.payment) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Invalid webhook structure" });
+    }
+
     const {
       order: { order_id },
       payment,
-    } = req.body.data;
-    const paymentStatus = payment.payment_status;
+    } = data;
 
-    // Status mapping
     const statusMap = {
       SUCCESS: "SUCCESSFUL",
       FAILED: "FAILED",
       PENDING: "PENDING",
     };
 
-    // Update order
     await Order.findOneAndUpdate(
       { orderId: order_id },
       {
-        status: statusMap[paymentStatus] || "PENDING",
+        status: statusMap[payment.payment_status] || "PENDING",
         paymentId: payment.payment_id,
       }
     );
 
-    // Upgrade user if payment successful
-    if (paymentStatus === "SUCCESS") {
+    if (payment.payment_status === "SUCCESS") {
       const order = await Order.findOne({ orderId: order_id });
       if (order) {
         await User.findByIdAndUpdate(order.userId, { isPremiumUser: true });
@@ -182,8 +147,8 @@ router.post("/cashfree-webhook", async (req, res) => {
 
     res.status(200).json({ success: true });
   } catch (error) {
-    console.error("Webhook error:", error);
-    res.status(500).json({ success: false });
+    console.error("❌ Webhook handler error:", error);
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 

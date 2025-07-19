@@ -33,8 +33,8 @@ exports.createOrder = async (orderData) => {
         customer_email: orderData.customerEmail || "no-email@example.com",
       },
       order_meta: {
-        return_url: `http://localhost:3001/payment-status?order_id=${order_id}`,
-        notify_url: `https://eb7c2a217442.ngrok-free.app/api/orders/cashfree-webhook`,
+        return_url: `${process.env.FRONTEND_URL}/payment-status?order_id=${order_id}`,
+        notify_url: `${process.env.BACKEND_URL}/api/orders/cashfree-webhook`,
         payment_methods: "cc,dc,upi,nb",
       },
       order_expiry_time: new Date(Date.now() + 3600000).toISOString(),

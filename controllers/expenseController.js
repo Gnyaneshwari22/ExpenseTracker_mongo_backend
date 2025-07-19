@@ -22,11 +22,20 @@ exports.addExpense = async (req, res) => {
 };
 
 exports.getExpenses = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 8;
+  const skip = (page - 1) * limit;
+
   try {
-    const expenses = await Expense.find({ userId: req.user.id }).sort({
-      createdAt: -1,
-    });
-    res.status(200).json(expenses);
+    const [expenses, totalCount] = await Promise.all([
+      Expense.find({ userId: req.user.id })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Expense.countDocuments({ userId: req.user.id }),
+    ]);
+
+    res.status(200).json({ expenses, totalCount });
   } catch (err) {
     res
       .status(500)

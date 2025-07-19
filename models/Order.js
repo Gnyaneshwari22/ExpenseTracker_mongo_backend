@@ -68,6 +68,3 @@ const orderSchema = new Schema(
 );
 
 module.exports = mongoose.model("Order", orderSchema);
-
-// return_url: `http://localhost:3000/payment-status?order_id=${orderData.orderId}`,
-// notify_url: `https://cbe897b62dde.ngrok-free.app/api/orders/cashfree-webhook`,
