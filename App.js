@@ -36,7 +36,7 @@ console.log(
   process.env.AWS_SECRET_ACCESS_KEY ? "Exists" : "Missing"
 );
 console.log("AWS_REGION:", process.env.AWS_REGION);
-console.log("AWS_BUCKET_NAME:", process.env.AWS_BUCKET_NAME);
+console.log("AWS_BUCKET_NAME:", process.env.S3_BUCKET);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
