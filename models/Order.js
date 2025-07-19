@@ -1,30 +1,3 @@
-// const mongoose = require("mongoose");
-// const { Schema } = mongoose;
-
-// const orderSchema = new Schema(
-//   {
-//     orderId: {
-//       type: String,
-//       required: true,
-//     },
-//     paymentId: {
-//       type: String,
-//     },
-//     status: {
-//       type: String,
-//       enum: ["PENDING", "SUCCESSFUL", "FAILED"],
-//       default: "PENDING",
-//     },
-//     userId: {
-//       type: Schema.Types.ObjectId,
-//       ref: "User",
-//       required: true,
-//     },
-//   },
-//   { timestamps: true }
-// );
-
-// module.exports = mongoose.model("Order", orderSchema);
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
